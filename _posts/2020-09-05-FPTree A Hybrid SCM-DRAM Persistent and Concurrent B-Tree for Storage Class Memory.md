@@ -1,23 +1,13 @@
 ---
-
-layout:   post
-
-title:   FPTree: A Hybrid SCM-DRAM Persistent and Concurrent B-Tree for Storage Class Memory
-
-subtitle:  关于FPTree自己的一些思考
-
-date:    2020-09-05
-
-author:   HustDsy
-
-header-img: post-bg-rwd.jpg
-
+layout:     post
+title:      FPTree A Hybrid SCM-DRAM Persistent and Concurrent B-Tree for Storage Class Memory
+subtitle:   FPTree
+date:       2020-09-05
+author:     HustDsy
+header-img: img/post-bg-ios9-web.jpg
 catalog: true
-
 tags:
-
---树索引
-
+    - 树索引
 ---
 
 #### 1.目标

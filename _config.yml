@@ -104,5 +104,8 @@ friends: [
     },{
         title: "cplusplus",
         href: "http://www.cplusplus.com/"
+    },{
+        title: "leetcode",
+        href: "https://leetcode-cn.com/problemset/all/"
     }
 ]

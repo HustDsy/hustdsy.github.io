@@ -4,7 +4,7 @@ title:      FPTree A Hybrid SCM-DRAM Persistent and Concurrent B-Tree for Storag
 subtitle:   FPTree
 date:       2020-09-05
 author:     HustDsy
-header-img: img/post-bg-ios9-web.jpg
+header-img: img/post-bg-rwd.jpg
 catalog: true
 tags:
     - 树索引

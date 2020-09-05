@@ -21,7 +21,7 @@ tags:
 
 <div align = "center">FP-Tree构造</div>
 
-![image-20200903195458035](/Users/dongshenyu/Library/Application Support/typora-user-images/image-20200903195458035.png)
+![FP-Tree构造](https://tva1.sinaimg.cn/large/007S8ZIlly1gig7luyy6gj30se08y0u2.jpg)
 
 如图二所示，非叶子节点有序的存储在DRAM中，叶子节点放在SCM中，并且叶子节点以链表的形式连接。这主要有以下两点的好处：
 

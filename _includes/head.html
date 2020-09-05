@@ -41,19 +41,20 @@
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
     css'>
     -->
-    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script> 
-<!-- mathjax config similar to math.stackexchange --> 
     <script type="text/x-mathjax-config"> 
-    MathJax.Hub.Config({ 
-    jax: ["input/TeX", "output/HTML-CSS"], 
-    tex2jax: { 
-        inlineMath: [ ['$', '$'] ], 
-        displayMath: [ ['$$', '$$']], 
-        processEscapes: true, 
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }, 
-    messageStyle: "none", 
-    "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] } 
-    }); 
+   		MathJax.Hub.Config({ TeX: { equationNumbers: { autoNumber: "all" } } }); 
+   	</script>
+    <script type="text/x-mathjax-config">
+    	MathJax.Hub.Config({tex2jax: {
+             inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+             displayMath: [ ['$$', '$$']], 
+             processEscapes: true
+           }
+         });
+    </script>
+    
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript">
+    </script>
     </script>
     
 

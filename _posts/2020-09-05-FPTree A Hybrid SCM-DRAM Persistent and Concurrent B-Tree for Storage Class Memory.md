@@ -37,8 +37,8 @@ tags:
 
 ##### 2.2.FingerPrint
 
-- <font color="red" face="黑体">**这里的平均查找次数主要指的时访问Key的次数，而不是查找次数**</font>
-- <font color=red face="黑体">**Finger主要的作用是来减少访问Key的次数，而不是减少查找次数**</font>
+- <font color="red" face="黑体">这里的平均查找次数主要指的时访问Key的次数，而不是查找次数</font>
+- <font color=red face="黑体">Finger主要的作用是来减少访问Key的次数，而不是减少查找次数</font>
 
 首先显而易见，对于一个无序链表的平均查找时间是$o(\frac{n+1}{2})$，这样子的线性扫描是昂贵的，是可以继续优化的。NV-Tree就是典型的代表。WB-Tree的节点是有序的，它的查找时间复杂度是o($log_2n$)，Fp-Tree如果节点是有序的话，那么写延迟带来的性能影响或许不可接受。因此作者采用fingerprint对数据进行过滤，fingerprint相当与key的hash值。下面来证明，这样子的查找期望值为1。假设现在有n(假设用一个字节来表示fingerprint那么它的值就是256)个fingerprint，m个键值对。
 
@@ -77,7 +77,9 @@ $$
 P(B)=1-(1-\frac{1}{n})^m
 $$
 
+
 现在就是来看$P(A|B)$的求法了，它就等于$P(A)$.刚好碰撞i次，那就是有i个key的hash是同一个fingerprint，对于m个key来说，选出i个key有多少种情况呢。那就是$\mathrm{C}{_m^i}$，一个key的哈希值是一个fingerprint概率是$\frac{1}{n}$，不是的概率为$1-\frac{1}{n}$，在事件A中$\mathrm{m}$个key中有i个key的hash是一样的，m-i个key的hash和这个i个key的hash值不一样。所以$P(A|B)$值为
+
 
 $$
 P(A|B)=\mathrm{C}{_m^i}(\frac{1}{n}){^i}(1-\frac{1}{n}){^{m-i}}
@@ -89,8 +91,7 @@ $$
 P(i)=\frac{\mathrm{C}{_m^i}(\frac{1}{n}){^i}(1-\frac{1}{n})^{m-i}}{1-(1-\frac{1}{n}){^m}}
 $$
 
-下面复杂度的推导换个思路，对于m个元素，碰撞次数的期望值为$E_k$，现在把这个冲突的$E_k$个数单独取出来分析，对于这$E_k$个数来说，它的遍历时间相当于一次线性遍历的时间，也就是$o(\frac{n+1}{2})$。当然这里的n就是我们的$E_k$了。
-所以FP-Tree的平均查找时间为$E_T$
+下面复杂度的推导换个思路，对于m个元素，碰撞次数的期望值为$E_k$，现在把这个冲突的$E_k$个数单独取出来分析，对于这$E_k$个数来说，它的遍历时间相当于一次线性遍历的时间，也就是$o(\frac{n+1}{2})$。当然这里的n就是我们的$E_k$了。所以FP-Tree的平均查找时间为$E_T$
 
 $$
 \begin{aligned}

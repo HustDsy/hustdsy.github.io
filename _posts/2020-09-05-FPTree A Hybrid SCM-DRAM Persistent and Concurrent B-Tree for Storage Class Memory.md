@@ -45,10 +45,10 @@ tags:
 大该的思路就是由于hash产生的多余的搜索次数是来自于碰撞，对于任何一个fingerprint产生碰撞的次数为1-m,最好的情况就是不产生碰撞，一次就命中了，如果产生碰撞的话次数就会增加。最多搜索m次。我们接下来假设这个期望值为$E_k$。
 
 1.假设出现的次数为i，出现i的概率为 $P(i)$.那么 $E_k$的求法就是
-
 $$
 E_k=\sum_{i=1}^{m}iP(i)
 $$
+
 
 2.接下来思考$P(i)$的求法，我们假设两个事件A，B。
 
@@ -60,39 +60,29 @@ $$
 查找一次的概率记作$P(B)$，查找i次的概率记作$P(A)$.
 
 根据联合概率公式有
-
 $$
 P(i)=P(A|B)=\frac{P(A\bigcap{B})}{P(B)}
 $$
-
 这么一来我们就只要算$P(B)$和$P(A\bigcap{B})$的概率即可。根据题目意思$P(B)$代表至少碰撞1次的概率，那么我们用1减去碰撞为0次的概率，也就是搜索不到的概率$P(\overline{B})$。
-
 $$
 P(B)=1-P(\overline{B})
 $$
-
 现在查找某个fingerprint，m个key没有一个的hash值是这个key。对于一个key，产生的hash值刚好是这个fingerprint的概率为$\frac{1}{n}$所以$P(B)$的数值为
-
 $$
 P(B)=1-(1-\frac{1}{n})^m
 $$
 
 现在就是来看$P(A|B)$的求法了，A和B的交集就是A事件本身的概率，因为B的情况包含A。刚好碰撞i次，那就是有i个key的hash是同一个fingerprint，对于m个key来说，选出i个key有多少种情况呢。那就是$\mathrm{C}{_m^i}$,一个key的哈希值是一个fingerprint概率是$\frac{1}{n}$,不是的概率为$1-\frac{1}{n}$，在事件A中$\mathrm{m}$个key中有i个key的hash是一样的，m-i个key的hash和这个i个key的hash值不一样。所以$P(A|B)$的
-
 $$
 P(A|B)=\mathrm{C}{_m^i}(\frac{1}{n}){^i}(1-\frac{1}{n}){^{m-i}}
 $$
-
 到这里公式推导到一半了，现在$P(i)$的公式就出来了
-
 $$
 P(i)=\frac{\mathrm{C}{_m^i}(\frac{1}{n}){^i}(1-\frac{1}{n})^{m-i}}{1-(1-\frac{1}{n}){^m}}
 $$
-
 下面复杂度的推导换个思路，对于m个元素，碰撞次数的期望值为$E_k$，现在把这个冲突的$E_k$个数单独取出来分析，对于这$E_k$个数来说，它的遍历时间相当于一次线性遍历的时间，也就是$o(\frac{n+1}{2})$。当然这里的n就是我们的$E_k$了。
 
 所以FP-Tree的平均查找时间为$E_T$
-
 $$
 \begin{aligned}
 E_T=\frac{1}{2}(1+E_K)
@@ -101,19 +91,17 @@ E_T=\frac{1}{2}(1+E_K)
 &=\frac{1}{2}({1+\frac{(\frac{n-1}{n})^m}{1-(\frac{n-1}{n})^m}(\frac{m}{n-1})\sum_{i=0}^{m-1}\frac{\mathrm{C}{_{m-1}^i}}{(n-1)^i}})&\text{............3}\\
 \end{aligned}
 $$
-
 对于式子3的后缀部分使用二项式定理$(1+x)^n=\mathrm{C}{_n^i}x^i$其中i的取值范围是$0\text{到}(n-1)$,所以3式可以化成
-
-
 $$
 \begin{aligned}
 E_T
 &=\frac{1}{2}({1+\frac{(\frac{n-1}{n})^m}{1-(\frac{n-1}{n})^m}(\frac{m}{n-1})(\frac{n}{n-1})^{m-1})}\\
 &=\frac{1}{2}(1+\frac{m}{n(1-(\frac{n-1}{n}){^m})})
+
+
+
 \end{aligned}
 $$
-
-
 一般来说，fingerprint是一字节大小的，可以表示256个不同的hash值，n也就是为256，当m取32的时候。代入公式得$E_K$为1.这个我用计数器算了一下，大概是接近于与，代入m=32，n=256即可。
 
 ##### 2.3Amortized persistent memory allocations(分摊持久性内存分配)
@@ -335,4 +323,7 @@ else
 	else
 		reset μLog;
 ```
+
+
+
 

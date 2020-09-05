@@ -79,12 +79,9 @@ $$
 
 
 现在就是来看$P(A|B)$的求法了，它就等于$P(A)$.刚好碰撞i次，那就是有i个key的hash是同一个fingerprint，m-i个key的hash和这个i个key的hash值不一样。所以$P(A|B)$值为
-
-
 $$
 P(A|B)=\mathrm{C}{_m^i}(\frac{1}{n}){^i}(1-\frac{1}{n}){^{m-i}}
 $$
-
 到这里公式推导到一半了，现在$P(i)$的公式就出来了
 
 $$

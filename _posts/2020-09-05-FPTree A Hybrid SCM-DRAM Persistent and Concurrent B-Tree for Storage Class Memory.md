@@ -117,7 +117,7 @@ $$
 
 持久性内存的分配带来的性能代价是昂贵的，在分裂阶段的持久性内存分配对于FP-Tree的性能有一定的影响。作者建议采用一次性分配多个叶节点块来解决这个问题。
 
-![image-20200904145933444](/Users/dongshenyu/Library/Application Support/typora-user-images/image-20200904145933444.png)
+![FPTree内存分配](https://tva1.sinaimg.cn/large/007S8ZIlly1gig7p4h3njj30tg0au0u3.jpg)
 
 如图五所示，作者一次性分配一组空闲的节点。下面L1->L2->L3->L4用来代表实际在FP-Tree被使用的节点。而对于没被使用的节点作者采用一个易失性的数组来进行索引。接下来讲述一下如何获取节点以及删除linkd list of groups叶组里面的节点。
 
@@ -145,7 +145,7 @@ $$
 
 这一部分主要是针并发性FP-Tree的讲解，主要是实现了上面原则的选择持久性，选择一致性以及FingerPrint这三个点，首先十分简单的说一下TSX事务，x_begin()代表事务开始，x_abort()代表事务中断,x_end()代表事务结束，其中事务中断的话会回滚到x_begin()再进行操作。
 
-![image-20200904162143646](/Users/dongshenyu/Library/Application Support/typora-user-images/image-20200904162143646.png)
+![FPTree操作](https://tva1.sinaimg.cn/large/007S8ZIlly1gig7q5e2dej30w00fajtl.jpg)
 
 ##### 3.1Find函数
 

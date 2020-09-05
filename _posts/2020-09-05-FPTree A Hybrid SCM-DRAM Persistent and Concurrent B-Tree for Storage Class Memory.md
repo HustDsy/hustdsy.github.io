@@ -77,7 +77,7 @@ $$
 P(B)=1-(1-\frac{1}{n})^m
 $$
 
-接下来求$P(A\bigcap{B})$
+接下来求$P(A\mid{B})$
 
 $$
 P(A|B)=\mathrm{C}{_m^i}(\frac{1}{n}){^i}(1-\frac{1}{n}){^{m-i}}

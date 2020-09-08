@@ -158,7 +158,7 @@ ConcurrentFind(Key K):
     if Leaf.lock == 1 then //如果这个叶子节点正在被占用的话，从begin重新开始
       speculative_lock.abort();//相当于x_abort()
       continue;
-		//fingerprint的作用就是减少不必要的K的读取时间
+    //fingerprint的作用就是减少不必要的K的读取时间
     for each slot in Leaf do
       set currentKey to key pointed to by Leaf.KV[slot].PKey
       //如果这个slot有效的话，并且FingerPrint也对的上的话，再去访问真实的Key，由于碰撞次数期望值为1，因此基本访问一次即可
@@ -179,48 +179,48 @@ ConcurrentInsert(Key K, Value V)
   Decision = Result::Abort;
   while Decision == Result::Abort do
   	speculative_lock.acquire(); //x_begin，TSX事务的开始
- 	  (Leaf, Parent) = FindLeaf(K);//找到要插入的叶子节点，以及该节点的父亲节点
- 	 	if Leaf.lock == 1 then //一致性需要，如果被锁住了，等待
-      Decision = Result::Abort; Continue;
-  	Leaf.lock = 1; /* Writes to leaf locks are never persisted 插入操作，上锁*/
+    (Leaf, Parent) = FindLeaf(K);//找到要插入的叶子节点，以及该节点的父亲节点
+    if Leaf.lock == 1 then //一致性需要，如果被锁住了，等待
+        Decision = Result::Abort; Continue;
+  	Leaf.lock = 1; /* Writes to leaf locks are never persisted    插入操作，上锁*/
   	Decision = Leaf.isFull() ? Result::Split : Result::Insert;//判断要插入的叶子节点是否需要分裂
   	speculative_lock.release();//x_end TSX事务结束，
-	if Decision == Result::Split then//如果需要进行分裂，先进行分裂操作
-		splitKey = SplitLeaf(Leaf);	
+  if Decision == Result::Split then//如果需要进行分裂，先进行分裂操作
+    splitKey = SplitLeaf(Leaf);	
 	//分裂完成开始插入操作
-	slot = Leaf.Bitmap.FindFirstZero(); //找到第一个空的slot
+  slot = Leaf.Bitmap.FindFirstZero(); //找到第一个空的slot
   Leaf.KV[slot] = (K, V); //将K，V值写入这个槽
-	Leaf.Fingerprints[slot] = hash(K);//写入fingerprint
- 	Persist(Leaf.KV[slot]); //持久化这个KV槽
-	Persist(Leaf.Fingerprints[slot]);//持久化指纹
+  Leaf.Fingerprints[slot] = hash(K);//写入fingerprint
+  Persist(Leaf.KV[slot]); //持久化这个KV槽
+  Persist(Leaf.Fingerprints[slot]);//持久化指纹
   Leaf.Bitmap[slot] = 1; //将位设为1，只有这样子 这个槽才算有效
-	Persist(Leaf.Bitmap);//持久化
-	//DRAM部分的非叶子节点在TSX事务中进行更行
+  Persist(Leaf.Bitmap);//持久化
+  //DRAM部分的非叶子节点在TSX事务中进行更行
   if Decision == Result::Split then
     speculative_lock.acquire();
-		UpdateParents(splitKey, Parent, Leaf);//update函数应该包含两种情况，parent拆分与不拆分
+    UpdateParents(splitKey, Parent, Leaf);//update函数应该包含两种情况，parent拆分与不拆分
   	speculative_lock.release();
-	Leaf.lock = 0;
+  Leaf.lock = 0;
 ```
 //分裂函数，采取日志来进行操作的
 SplitLeaf(LeafNode Leaf)
 
 ```c++
-  get μLog from SplitLogQueue;
-  set μLog.PCurrentLeaf to persistent address of Leaf; //PCurrentLeaf 要分裂的叶子节点地址
-  Persist(μLog.PCurrentLeaf);//持久化 step1
-  Allocate(μLog.PNewLeaf, sizeof(LeafNode))//PNewLeaf指向新分配的节点的地址 step2
-  set NewLeaf to leaf pointed to by μLog.PNewLeaf; //PNewLeaf 已经分裂的新节点的地址
-  Copy the content of Leaf into NewLeaf;//将旧节点的内容copy到新节点去                             ----赋值操作
-  Persist(NewLeaf);//将NewLeaf持久化
-  (splitKey, bmp) = FindSplitKey(Leaf);//得到要插入的KV值的key和bmp(这一部分是在旧数据当中)
-  NewLeaf.Bitmap = bmp;//将旧数据的bmp拷贝给NewLeaf
-  Persist(NewLeaf.Bitmap);//原子写持久化bitmap
-  Leaf.Bitmap = inverse(NewLeaf.Bitmap);//旧节点的数据拷贝走了，置为空 step3                       ------继续操作
-  Persist(Leaf.Bitmap);//持久化bitmap 
-  set Leaf.Next to persistent address of NewLeaf; //修改链表，leaf的下一个节点指向newLeaf
-  Persist(Leaf.Next);//持久化next指针
-  reset μLog;//重置日志
+get μLog from SplitLogQueue;
+set μLog.PCurrentLeaf to persistent address of Leaf; //PCurrentLeaf 要分裂的叶子节点地址
+Persist(μLog.PCurrentLeaf);//持久化 step1
+Allocate(μLog.PNewLeaf, sizeof(LeafNode))//PNewLeaf指向新分配的节点的地址 step2
+set NewLeaf to leaf pointed to by μLog.PNewLeaf; //PNewLeaf 已经分裂的新节点的地址
+Copy the content of Leaf into NewLeaf;//将旧节点的内容copy到新节点去                             ----赋值操作
+Persist(NewLeaf);//将NewLeaf持久化
+(splitKey, bmp) = FindSplitKey(Leaf);//得到要插入的KV值的key和bmp(这一部分是在旧数据当中)
+NewLeaf.Bitmap = bmp;//将旧数据的bmp拷贝给NewLeaf
+Persist(NewLeaf.Bitmap);//原子写持久化bitmap
+Leaf.Bitmap = inverse(NewLeaf.Bitmap);//旧节点的数据拷贝走了，置为空 step3                       ------继续操作
+Persist(Leaf.Bitmap);//持久化bitmap 
+set Leaf.Next to persistent address of NewLeaf; //修改链表，leaf的下一个节点指向newLeaf
+Persist(Leaf.Next);//持久化next指针
+reset μLog;//重置日志
 ```
 
 ```c++
@@ -248,7 +248,7 @@ delete分为三种情况：
 
 1. 在叶子中找不到要删除的key
 2. 叶子包含要删除的key以及其它key
-3. 叶子中只包含要删除的key（<font color="red">**可能涉及回收操作**</font>）
+3. 叶子中只包含要删除的key（<font color="red"><strong>可能涉及回收操作</strong></font>）
 
 对应的处理情况如下：
 
@@ -263,29 +263,30 @@ delete分为三种情况：
 ```c++
 Decision = Result::Abort;
 while Decision == Result::Abort do
-	speculative_lock.acquire(); //TXS事务开始
-  /* PrevLeaf is locked only if Decision == LeafEmpty */ 
-  (Leaf, PPrevLeaf) = FindLeafAndPrevLeaf(K); //寻找key所在的节点
-  if Leaf.lock == 1 then //被锁住了 继续下一个循环
-  	Decision = Result::Abort; Continue; 
+    speculative_lock.acquire(); //TXS事务开始
+    /* PrevLeaf is locked only if Decision == LeafEmpty */ 
+    (Leaf, PPrevLeaf) = FindLeafAndPrevLeaf(K); //寻找key所在的节点
+    if Leaf.lock == 1 then //被锁住了 继续下一个循环
+        Decision = Result::Abort;
+        Continue; 
 	if Leaf.Bitmap.count() == 1 then//这个叶子节点的key只有一个的话，说明删完之后要free了
-  	if PPrevLeaf->lock == 1 then//因为要处理左节点，所以左节点被锁住了的话，继续等待
-  		Decision = Result::Abort; Continue; 
+        if PPrevLeaf->lock == 1 then//因为要处理左节点，所以左节点被锁住了的话，继续等待
+            Decision = Result::Abort; Continue; 
 		Leaf.lock = 1; 
 		PPrevLeaf->lock = 1; //锁住要处理的节点
 		Decision = Result::LeafEmpty;//标记删完之后叶子就要被free了
-  else//如果出了要删除的key还有其他key
+    else//如果出了要删除的key还有其他key
 		Leaf.lock = 1; //只处理这个叶子就好，clock
-		Decision = Result::Delete; //标记只要删除操作 不用free
+        Decision = Result::Delete; //标记只要删除操作 不用free
 	speculative_lock.release();//前面的操作在TSX事务就行
-  if Decision == Result::LeafEmpty then //如果需要free的话
+if Decision == Result::LeafEmpty then //如果需要free的话
     DeleteLeaf(Leaf, PPrevLeaf); //删除这个叶子
-		PrevLeaf.lock = 0;//释放锁
-  else //不用free的话，将bitmap置为0就行
-  	slot = Leaf.FindInLeaf(K);
-		Leaf.Bitmap[slot] = 0;
-		Persist(Leaf.Bitmap[slot]); 
-		Leaf.lock = 0;
+    PrevLeaf.lock = 0;//释放锁
+else //不用free的话，将bitmap置为0就行
+    slot = Leaf.FindInLeaf(K);
+    Leaf.Bitmap[slot] = 0;
+    Persist(Leaf.Bitmap[slot]); 
+    Leaf.lock = 0;
 ```
 
 <div style="color:green" align="center" >
@@ -299,13 +300,13 @@ set μLog.PCurrentLeaf to persistent address of Leaf;
 Persist(μLog.PCurrentLeaf);//用一个持久性的指针指向要删除的节点
 if μLog.PCurrentLeaf == PHead then//如果要删除的节点是头结点
 	/* Leaf is the head of the linked list of leaves */
-  PHead = Leaf.Next;//直接将头结点换成leaf.next也就是A->B->C,变成B->C
+    PHead = Leaf.Next;//直接将头结点换成leaf.next也就是A->B->C,变成B->C
 	Persist(PHead);
 else//这种情况就是A->B->C变为A->C
-  μLog.PPrevLeaf = PPrevLeaf; 
-  Persist(μLog.PPrevLeaf); //记录要要删除的节点的
-  PrevLeaf.Next = Leaf.Next; //直接A->C
-  Persist(PrevLeaf.Next)//持久化
+    μLog.PPrevLeaf = PPrevLeaf; 
+    Persist(μLog.PPrevLeaf); //记录要要删除的节点的
+    PrevLeaf.Next = Leaf.Next; //直接A->C
+    Persist(PrevLeaf.Next)//持久化
 Deallocate(μLog.PCurrentLeaf); //删除
 reset μLog;
 ```
@@ -319,17 +320,14 @@ get head of linked list of leaves PHead;
 if μLog.PCurrentLeaf != NULL and μLog.PPrevLeaf != NULL then
 	/* Crashed between lines DeleteLeaf:12-14 */
 	Continue from DeleteLeaf:12;
-else
-	if μLog.PCurrentLeaf != NULL and μLog.PCurrentLeaf == PHead 
-  then
-		/* Crashed at line DeleteLeaf:7 */
-		Continue from DeleteLeaf:7;
-else
-	if μLog.PCurrentLeaf != NULL and μLog.PCurrentLeaf→Next== PHead then
-		/* Crashed at line DeleteLeaf:14 */
+else if μLog.PCurrentLeaf != NULL and μLog.PCurrentLeaf == PHead then
+    /* Crashed at line DeleteLeaf:7 */
+    Continue from DeleteLeaf:7;
+else if μLog.PCurrentLeaf != NULL and μLog.PCurrentLeaf→Next== PHead then
+    /* Crashed at line DeleteLeaf:14 */
     Continue from DeleteLeaf:14;
-	else
-		reset μLog;
+else
+    reset μLog;
 ```
 
 

@@ -97,3 +97,6 @@ friends: [
         href: "https://leetcode-cn.com/problemset/all/"
     }
 ]
+
+#read more
+excerpt_separator:  '<!-- more -->'

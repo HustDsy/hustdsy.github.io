@@ -14,9 +14,7 @@ description: "Thinking will not overcome fear but action will."
             {{ post.subtitle }}
         </h3>
         {% endif %}
-        <div class="post-content-preview">
-            {{ post.content | strip_html | truncate:200 }}
-        </div>
+        {{ post.excerpt | strip_html }}
     </a>
     <p class="post-meta">
         Posted by {% if post.author %}{{ post.author }}{% else %}{{ site.title }}{% endif %} on {{ post.date | date: "%B %-d, %Y" }}
@@ -40,10 +38,3 @@ description: "Thinking will not overcome fear but action will."
     {% endif %}
 </ul>
 {% endif %}
-<!--readmore-->
-<hr>
-   {\{ post.excerpt }}
-   <p><h3>
-   <a href="{\{ post.url }}">ReadMore &raquo;</a>
-   </h3></p>
-<hr>

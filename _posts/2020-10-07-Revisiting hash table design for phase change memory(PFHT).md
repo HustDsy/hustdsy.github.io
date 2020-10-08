@@ -2,7 +2,7 @@
 layout:     post
 title:      Revisiting Hash Table Design for Phase Change Memory
 subtitle:   PFHT
-date:       2020-09-06
+date:       2020-10-07
 author:     HustDsy
 header-img: img/post-bg-rwd.jpg
 catalog: true

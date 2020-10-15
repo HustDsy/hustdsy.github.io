@@ -7,7 +7,7 @@ author:     HustDsy
 header-img: img/post-bg-rwd.jpg
 catalog: true
 tags:
-    - C++ Primer
+    - Hash索引
 ---
 
 > 这一篇论文提出了一种新型的解决哈希冲突的方案，全文8页，现在已存的Hash方案容易造成级联写，对于寿命有限的PCM并且写延迟高的PCM来说不太友好。这里主要讲一下大致的结构，以及增删改查操作。

@@ -22,7 +22,7 @@ tags:
 
 #### 1.2*Hashing Index Structures for NVM*
 
-传统的*Hash*策略包括链式哈希，开放地址哈希，BCH(Bucket Cuckoo Hash)，已有的NVMHash主要是在以往的Hash基础上减少了写次数，比如*Path Hash*，*Level Hash*
+传统的*Hash*策略包括链式哈希，开放地址哈希，BCH(Bucket Cuckoo Hash)，已有的NVM Hash主要是在以往的Hash基础上减少了写次数，比如*Path Hash*，*PFHT*
 
 ![image-20201015095901672](https://gitee.com/hustdsy/blog-img/raw/master/image-20201015095901672.png)
 

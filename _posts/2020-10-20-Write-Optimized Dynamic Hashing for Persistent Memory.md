@@ -83,7 +83,7 @@ For Example：这里的话，我们使用前两位作为目录的索引，这个
 
 #### 3.1Insert And Delete
 
-失败原子写的大小为8B。我们一般写入key，val键值对的顺序是先写val，再写key。如果再val和key之间崩溃的话，这样子的话，只插入了val，根据key我们索引不到这个位置，因为比较操作是根据我们传入的key索引段号和桶号，再一一比对key，但这时候key没写入所以这个位置依然无效。如果先写key再写val的话，这样子的话，key写进去了，我们索引到了这个位置，比对key也一样，但是发现val不在，这就导致了部分更新。如果key是8B的话，就刚刚好通过一个clwb指令写入即可，如果大于8B的话，比如key是32B。因为我们使用的是MSB位索引段位，我们先写入后24B,再原子写入8B。当我们前8B没有成功写入的话，段号就可能不对，这样子的话相当于Lazy Deletion，这里面的数据相当于无效数据。当我们要删除一个key的时候，只需要将key的8B写入就行。
+失败原子写的大小为8B。我们一般写入key，val键值对的顺序是先写val，再写key。如果再val和key之间崩溃的话，这样子的话，只插入了val，根据key我们索引不到这个位置，因为比较操作是根据我们传入的key索引段号和桶号，再一一比对key，但这时候key没写入所以这个位置依然无效。如果先写key再写val的话，这样子的话，key写进去了，我们索引到了这个位置，比对key也一样，但是发现val不在，这就导致了部分更新。如果key是8B的话，就刚刚好通过一个clwb指令写入即可，如果大于8B的话，比如key是32B。因为我们使用的是MSB位索引段位，我们先写入后24B,再原子写入8B。当我们前8B没有成功写入的话，段号就可能不对，这样子的话相当于Lazy Deletion，这里面的数据相当于无效数据。当我们要删除一个key的时候，只需要将key的8B改写就行。
 
 > 这里的话，我觉得使用token可能会更加好，按照作者的说法，当key大于8B的话，我们需要一次clwb(value),clwb(24B key) menfence clwb(8B key)。这里的话使用token的话，clwb(key),clwb( value),menfence clwb(token),大概这样子的顺序，但是我觉得使用token查找起来可以省略一下对比key的操作,在Lazy Delete那里只需要将所有Token变为0就行，然后和本地深度的元数据一起clwb就行，这里建议采用失败原子写，元数据不超过8B比较好。
 
@@ -96,8 +96,6 @@ For Example：这里的话，我们使用前两位作为目录的索引，这个
 <img src="https://gitee.com/hustdsy/blog-img/raw/master/%E6%88%AA%E5%B1%8F2020-10-21%2015.19.02.png" alt="截屏2020-10-21 15.19.02" style="zoom:50%;" />
 
 下面来看一个缩小的例子。这里的话，我自己画图，从左到右遍历，左边深度为1，应该由两个条目指向这个段，从左到右遍历，看到11的本地深度为2，不对，所以改为1.
-
-![image-20201022085157337](https://gitee.com/hustdsy/blog-img/raw/master/image-20201022112448048.png)
 
 ## 4.Concurrency and Consistency Model
 

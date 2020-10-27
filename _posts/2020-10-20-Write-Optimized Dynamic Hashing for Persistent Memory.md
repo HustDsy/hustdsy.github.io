@@ -35,7 +35,7 @@ For Example：这里的话，我们使用前两位作为目录的索引，这个
 
 <img src="https://gitee.com/hustdsy/blog-img/raw/master/image-20201020162144365.png" alt="image-20201020162144365" style="zoom:50%;" />
 
-对于分割操作，假设我们现在需要插入数据$1010...11111110_{(2)}$到图(a)中，我们索引10，找到了对应段，根据$11111110$索引到对应的bucket，我们发先bucket已经满了，而且有个$1101...11111110_{(2)}$的数据，那么我们可以执行分割操作将这个数据分配到Segment4中去。那么分割的步骤是什么样子的:
+对于分割操作，假设我们现在需要插入数据  $1010...11111110_{(2)}$ 到图(a)中，我们索引10，找到了对应段，再根据$11111110$索引对应的bucket，我们发现bucket已经满了，那我们可以执行分割操作，将$11$开头的数据分割出去
 
 - 首先将*Segment3*中的$11$开头的数据赋值到*Segment4*中
 - 让目录$11$的指针指向*Segment4*，并且更新*Segment4*的本地深度
@@ -120,7 +120,7 @@ For Example：这里的话，我们使用前两位作为目录的索引，这个
 
 - 随着Segment大小的增加,EXTH的clflush指令次数逐渐变小，这是因为段分割和目录分割次数变少了。但是插入性能和查找性能变差了，因为查找一个数据的时候可能需要查询更多的桶。而CCEH的插入和查找性能却提升了，这是因为它插入的时候会去索引在哪个桶，因此不会访问多个桶。256KB的时候，clflush指令增加我的理解是数据太多，分裂一次的代价太大了。还一个点就是CCEH的探测距离也逐渐变小随着段的增大。
 
-  <mark>*This is because the larger the segment size, the more bits CCEH uses to determine which cacheline in the seg- ment needs to be accessed*</mark>
+  <mark>This is because the larger the segment size, the more bits CCEH uses to determine which cacheline in the seg- ment needs to be accessed</mark>
 
 - CCEH(LSB)和CCEH(MSB)相比起来，MSB的性能要优于LSB，因为分割段的时候MSB很好的利用了局部性。其访问的目录是连续的，而LSB访问的目录是零零散散的。
 

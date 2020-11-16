@@ -58,6 +58,8 @@ Clevel和level很像，也是多重结构，与Level Hash不同的是，每个le
 
 ###### 2.1.2 The Support for Concurrent Resizing
 
+<img src="https://gitee.com/hustdsy/blog-img/raw/master/image-20201028100200445.png" alt="image-20201028100200445" style="zoom:50%;" />
+
 Clevel有一个全局的Context，它包括两个指针以及一个flag。其中last_level指向最底层的level，first_level指向最上层的level，flag用来标识Hash Table是否正在进行rehash操作。每个线程都保留了一个<strong>指向全局Context的指针ptr</strong>。*Resizing*操作主要包括五个步骤：
 
 1. 每个线程Copy一份指向*Context*的指针副本。
@@ -74,5 +76,29 @@ Clevel有一个全局的Context，它包括两个指针以及一个flag。其中
 
 4. 重新散列最后一层中的每个项。重散列包括两个步骤:通过CAS将项的指针复制到第一级的候选bucket，然后删除最后一级的指针，如果找不到位置的话 rehash
 
-5. 当重新哈希完成时，使用CoW + CAS原子地更新全局上下文中的最后一个级别和可选is_resizing(如果在调整大小之后只剩下两个级别)。如果CAS失败，如果当前上下文中的最后一层没有被修改，请再次尝试
+5. 当重新哈希完成时，使用CoW + CAS原子地更新全局上下文中的最后一个级别和可选is_resizing(如果在调整大小之后只剩下两个级别)。如果CAS失败，继续尝试。
+
+## 3.Lock-free Concurrency Control
+
+为了减少对共享资源的争用，作者提出了无锁的并发控制
+
+#### 3.1 Search
+
+查询操作主要面临两个问题，1）指针的解引用开销很高，由于clevel只保存指向真实的key的指针，一个一个读取指针进行遍历的话将会造成很多不必要的读。2）由于数据移动而丢失插入项。同时调整大小会移动到最后一层的项，因此，不带任何锁的搜索可能会遗漏插入的项。
+
+<strong>Solution 1：</strong>对于第一个问题，作者采用的是类似于fingerprint的技术，这里称作为tag。对于每个key我们保存一个16位的tag，tag的计算可以去hash(key)的前2B的字节的数据（相当于保存部分key）。这样字的话，读取先比较tag，tag再对的话，就去读取指针，然后解引用读取key。这里不使用额外的元数据进行存储tag。因为指针只需要48位即可，也就是6B的指针大小即可。因此作者使用指针的前2B去当做tag。
+
+<strong>Solution 2：</strong>对于第二个问题，作者采用的搜索策略是自底向上搜索，因为扩容操作是将下面的数据移动到上面。但是有一种会出现丢失数据的问题。那就是其它线程，通过一个新线程将我们要搜索的数据重新rehash到它新申请的级别中，所以当我们所搜不到的时候，就会CAS比较Context内容是否一致，如果不一致的话，那就重新进行搜索操作。
+
+## 3.2 Insertion
+
+在查询之前首先检测有没有重复的数据，有的话就进行更新操作。没有重复数据并且有空位置的话，就原子写入指向key和value的指针。当没有空位置的时候就进行扩容操作。但是无锁操作可能会有两个问题
+
+1）可能插入一样的数据，并发线程可能会将具有相同的key的项插入不同的槽中，这会导致删除和更新的失败
+
+2）新插入的数据插入到旧的last_level中的话，旧的last_level重哈希之后被释放的话就会丢失数据。
+
+<strong>Solution 1：</strong>对于第一个问题，作者在插入和删除操作中解决。
+
+<strong>Solution 2：</strong>对于第二个问题，作者提出了一种
 

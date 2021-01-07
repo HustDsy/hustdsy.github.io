@@ -1,13 +1,13 @@
 ---
-\layout:     post
-title:      3.Operating System Support for Persistent Memory
+layout:     post
+title:      3.Persistent Memory Architecturey
 subtitle:   PMDK
 date:       2020-12-15
 author:     HustDsy
 header-img: img/post-bg-rwd.jpg
 catalog: true
 tags:
-    - PMDK
+    - PMDK
 ---
 
 > 第三章主要是介绍操作系统如何将持久内存作为平台资源来进行管理

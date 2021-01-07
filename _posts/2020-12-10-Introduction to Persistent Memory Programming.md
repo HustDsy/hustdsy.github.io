@@ -2,12 +2,12 @@
 layout:     post
 title:      1.Introduction to Persistent Memory Programming
 subtitle:   PMDK
-date:       2020-12-10
+date:       2020-12-15
 author:     HustDsy
 header-img: img/post-bg-rwd.jpg
 catalog: true
 tags:
-    - PMDK
+    - PMDK
 ---
 
 > 这周一定抓紧时间吧PMEMOBJ这一块看完！！！先从第一章节开始吧，这一章节主要是为了对持久性内存编程做一个介绍

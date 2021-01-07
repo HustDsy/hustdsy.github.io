@@ -2,7 +2,7 @@
 layout:     post
 title:      2.Operating System Support for Persistent Memory
 subtitle:   PMDK
-date:       2020-09-06
+date:       2020-12-15
 author:     HustDsy
 header-img: img/post-bg-rwd.jpg
 catalog: true

@@ -1,13 +1,13 @@
 ---
 layout:     post
-title:      2.Persistent Memory Architecture
+title:      2.Operating System Support for Persistent Memory
 subtitle:   PMDK
-date:       2020-12-15
+date:       2020-09-06
 author:     HustDsy
 header-img: img/post-bg-rwd.jpg
 catalog: true
 tags:
-    - PMDK
+    - PMDK
 ---
 
 > 第二章主要介绍持久性内存的架构，内容比较多

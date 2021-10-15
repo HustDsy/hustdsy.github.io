@@ -1,5 +1,5 @@
 ---
-     layout:     post
+layout:     post
 title:      AniFilter: Parallel and Failure-Atomic Cuckoo Filter for Non-Volatile Memories
 subtitle:   PM版本上的过滤器
 date:       2021-05-06
@@ -16,7 +16,7 @@ tags:
 
 ## 1.背景介绍
 
-近似成员查询数据结构(Approximate Membership Query)表示了一组用于近似成员查询的结构。AMQ对于将数据存储在DRAM，SSDS，硬盘上的数据库，网络管理等领域有很大的应用。对于这些存储媒介上的AMQS有很多的优化。新型非易失性内存兼顾了SSDs的持久性以及DRAM的低延迟。现在对于PM上的哈希，树等索引结构有了很大的优化，但是对于AMQS类似的数据结构优化几乎没有。这篇问文章的对比实验有BF(布隆过滤器)，CF(布谷过滤器)，MF( Morton Filter,一个基于DRAM进行优化的过滤器)，RSQF(Rank-and-Select Quotient Filter ,一个基于SSD进行优化的数据库）。
+近似成员查询数据结构(Approximate Membership Query)表示了一组用于近似成员查询的结构。AMQ对于将数据存储在DRAM，SSDS，硬盘上的数据库，网络管理等领域有很大的应用。对于这些存储媒介上的AMQS有很多的优化。新型非易失性内存兼顾了SSDs的持久性以及DRAM的低延迟。现在对于PM上的哈希，树等索引结构有了很大的优化，但是对于AMQS类似的数据结构优化几乎没有。这篇问文章的对比实验有BF(布隆过滤器)，CF(布谷过滤器)，MF( Morton Filter,一个基于DRAM进行优化的过滤器)，RSQF(Rank-and-Select Quotient Filter ,一个基于SSD进行优化的过滤器）。
 
 ## 2.设计方案
 

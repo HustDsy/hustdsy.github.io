@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      AniFilter: Parallel and Failure-Atomic Cuckoo Filter for Non-Volatile Memories
+title:      AniFilter-Parallel and Failure-Atomic Cuckoo Filter for Non-Volatile Memories
 subtitle:   PM版本上的过滤器
 date:       2021-05-06
 author:     HustDsy
@@ -9,7 +9,6 @@ catalog: true
 tags:
     - 过滤器
     - Hash索引
-
 ---
 
 > 这篇论文实现了一个PM友好的过滤器，主要是基于布谷过滤器进行改进。这篇博客记录一下文章中作者提出的优化点，公式推导以及实验对比。
